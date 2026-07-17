@@ -1,0 +1,11 @@
+{
+  "name": "mqtt-dummy",
+  "version": "1.0.0",
+  "main": "app/publisher.js",
+  "scripts": {
+    "start": "node app/publisher.js"
+  },
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "mqtt-service",
+  "version": "1.0.0",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "node app/index.js"
+  },
+  "dependencies": {
+    "mqtt": "^4.3.7",
+    "axios": "^1.4.0"
+  }
+}
