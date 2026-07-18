@@ -8,10 +8,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: makanminggu12
-      MYSQL_DATABASE: modbus-test
-      MYSQL_USER: sensync_user
-      MYSQL_PASSWORD: makanminggu12
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -20,12 +20,29 @@ services:
       timeout: 3s
       retries: 5
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - mysql
+    # networks:
+    #   - sparing-12-network
+
   mosquitto:
     image: eclipse-mosquitto:2.0
     container_name: mosquitto
     ports:
       - "1883:1883"
     restart: unless-stopped
+    volumes:
+    - ./mosquitto/config:/mosquitto/config
+    - ./mosquitto/data:/mosquitto/data
+    - ./mosquitto/log:/mosquitto/log
 
   mqtt-service:
     build: ./mqtt-service
@@ -34,9 +51,9 @@ services:
       - mosquitto
       - db-service
     environment:
-      - MQTT_BROKER_URL=mqtt://mosquitto:1883
-      - MQTT_TOPIC=plc/#
-      - DB_SERVICE_URL=http://db-service:8001
+      - MQTT_BROKER_URL=${MQTT_BROKER_URL}
+      - MQTT_TOPIC=${MQTT_TOPIC}
+      - DB_SERVICE_URL=${DB_SERVICE_URL}
 
   mqtt-dummy:
     build: ./mqtt-dummy
@@ -44,10 +61,10 @@ services:
     depends_on:
       - mosquitto
     environment:
-      - MQTT_BROKER_URL=mqtt://mosquitto:1883
-      - MQTT_TOPIC_PREFIX=plc
-      - PLC_ID=plc1
-      - PUBLISH_INTERVAL=5000
+      - MQTT_BROKER_URL=${MQTT_BROKER_URL}
+      - MQTT_TOPIC_PREFIX=${MQTT_TOPIC_PREFIX}
+      - PLC_ID=${PLC_ID}
+      - PUBLISH_INTERVAL=${PUBLISH_INTERVAL}
 
   db-service:
     build: ./db-service
@@ -55,20 +72,21 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
-      - DATABASE_URL=mysql://root:makanminggu12@mysql:3306/modbus-test
+      - DATABASE_URL=${DATABASE_URL}
 
-  modbus-service:
-    build: ./modbus-service
-    container_name: modbus-service
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db-service
-    environment:
-      - DB_SERVICE_URL=http://db-service:8001
-      - POLL_INTERVAL=5
+  # modbus-service:
+  #   build: ./modbus-service
+  #   container_name: modbus-service
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - db-service
+  #   environment:
+  #     - DB_SERVICE_URL=http://db-service:8001
+  #     - POLL_INTERVAL=5
 
 volumes:
   mysql_data:
