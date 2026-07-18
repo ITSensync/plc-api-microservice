@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const databaseUrl = process.env.DATABASE_URL || 'mysql://root:makanminggu12@mysql:3306/modbus-test';
+const databaseUrl = process.env.DATABASE_URL || 'mysql://root:makanminggu12@mysql:3306/plc-test';
 const sequelize = new Sequelize(databaseUrl, {
   dialect: 'mysql',
   logging: false,
@@ -12,25 +12,33 @@ const PlcRecord = sequelize.define('PlcRecord', {
     autoIncrement: true,
     primaryKey: true,
   },
-  plc_id: {
+  _terminalTime: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  host: {
+  _groupName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  port: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+  arus1: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
   },
-  unit_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+  arus2: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
   },
-  values: {
-    type: DataTypes.JSON,
-    allowNull: false,
+  arus3: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
+  tegangan: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
+  kwatt: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
   },
 }, {
   tableName: 'plc_records',

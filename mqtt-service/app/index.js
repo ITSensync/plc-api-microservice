@@ -20,24 +20,23 @@ client.on('connect', () => {
 client.on('message', async (topic, message) => {
   try {
     const payloadStr = message.toString();
-    let values;
+    let payload;
     try {
-      values = JSON.parse(payloadStr);
+      payload = JSON.parse(payloadStr);
     } catch (_) {
-      // if not JSON, store raw message
-      values = { raw: payloadStr };
+      // if not JSON, skip
+      console.error('Invalid JSON from', topic);
+      return;
     }
 
-    // derive plc_id from topic last segment
-    const parts = topic.split('/');
-    const plcId = parts[parts.length - 1] || topic;
-
     const record = {
-      plc_id: plcId,
-      host: 'mqtt',
-      port: 1883,
-      unit_id: 0,
-      values,
+      _terminalTime: payload._terminalTime || new Date().toISOString(),
+      _groupName: payload._groupName || 'datamqtt',
+      arus1: payload.arus1 || null,
+      arus2: payload.arus2 || null,
+      arus3: payload.arus3 || null,
+      tegangan: payload.tegangan || null,
+      kwatt: payload.kwatt || null,
     };
 
     const res = await axios.post(`${DB_SERVICE_URL}/records`, record, { timeout: 5000 });
