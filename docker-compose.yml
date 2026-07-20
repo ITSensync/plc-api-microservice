@@ -6,7 +6,7 @@ services:
     container_name: mysql
     restart: unless-stopped
     ports:
-      - "3307:3307"
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -21,7 +21,7 @@ services:
       retries: 5
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin:5.2.2
     restart: always
     ports:
       - "8000:80"
@@ -29,7 +29,8 @@ services:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     # networks:
     #   - sparing-12-network
 
