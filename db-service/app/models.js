@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const databaseUrl = process.env.DATABASE_URL || 'mysql://root:makanminggu12@mysql:3306/plc-test';
+const databaseUrl = process.env.DATABASE_URL || 'mysql://root:makanminggu12@mysql:3307/plc-test';
 const sequelize = new Sequelize(databaseUrl, {
   dialect: 'mysql',
   logging: false,
