@@ -33,38 +33,39 @@ services:
     # networks:
     #   - sparing-12-network
 
-  mosquitto:
-    image: eclipse-mosquitto:2.0
-    container_name: mosquitto
-    ports:
-      - "1883:1883"
-    restart: unless-stopped
-    volumes:
-    - ./mosquitto/config:/mosquitto/config
-    - ./mosquitto/data:/mosquitto/data
-    - ./mosquitto/log:/mosquitto/log
+  # mosquitto:
+  #   image: eclipse-mosquitto:2.0
+  #   container_name: mosquitto
+  #   ports:
+  #     - "1883:1883"
+  #   restart: unless-stopped
+  #   volumes:
+  #   - ./mosquitto/config:/mosquitto/config
+  #   - ./mosquitto/data:/mosquitto/data
+  #   - ./mosquitto/log:/mosquitto/log
 
   mqtt-service:
     build: ./mqtt-service
     container_name: mqtt-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - mosquitto
       - db-service
     environment:
       - MQTT_BROKER_URL=${MQTT_BROKER_URL}
       - MQTT_TOPIC=${MQTT_TOPIC}
       - DB_SERVICE_URL=${DB_SERVICE_URL}
 
-  mqtt-dummy:
-    build: ./mqtt-dummy
-    container_name: mqtt-dummy
-    depends_on:
-      - mosquitto
-    environment:
-      - MQTT_BROKER_URL=${MQTT_BROKER_URL}
-      - MQTT_TOPIC_PREFIX=${MQTT_TOPIC_PREFIX}
-      - PLC_ID=${PLC_ID}
-      - PUBLISH_INTERVAL=${PUBLISH_INTERVAL}
+  # mqtt-dummy:
+  #   build: ./mqtt-dummy
+  #   container_name: mqtt-dummy
+  #   depends_on:
+  #     - mosquitto
+  #   environment:
+  #     - MQTT_BROKER_URL=${MQTT_BROKER_URL}
+  #     - MQTT_TOPIC_PREFIX=${MQTT_TOPIC_PREFIX}
+  #     - PLC_ID=${PLC_ID}
+  #     - PUBLISH_INTERVAL=${PUBLISH_INTERVAL}
 
   db-service:
     build: ./db-service
