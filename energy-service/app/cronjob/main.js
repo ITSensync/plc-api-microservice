@@ -1,0 +1,106 @@
+const recordService = require('../services/recordService');
+const machineStatusService = require('../services/machineStatusService');
+const activityLogService = require('../services/activityLogService')
+const runtimeService = require('../services/runtimeService');
+const averageRecordService = require('../services/averageRecordService');
+
+exports.checkRecords = async () => {
+  try {
+    const machineId = 'plc1';
+    const lastRecordsResponse = await recordService.fetchEnergyRecords({ limit: 1 });
+
+    if (lastRecordsResponse.status !== 200 || !lastRecordsResponse.data?.length) {
+      throw new Error('Last data not found');
+    }
+
+    const latestRecord = lastRecordsResponse.data[0];
+    const now = new Date();
+    const lastRecordTime = new Date(latestRecord.createdAt);
+    const secondsDiff = Math.floor((now - lastRecordTime) / 1000);
+
+    const targetStatus = secondsDiff > 10 ? 'stopped' : 'running';
+    const statusChanged = await updateStatusMachine(machineId, targetStatus);
+
+    if (statusChanged) {
+      const message = targetStatus === 'running'
+        ? 'Machine status changed to running'
+        : 'Machine status changed to stopped';
+
+      await createLog(machineId, message);
+
+      if (targetStatus === 'running') {
+        await inputStartTime(machineId);
+      } else {
+        await updateRuntime(machineId);
+      }
+    }
+
+    const statusMachineNow = await machineStatusService.fetchStatus({ machineId });
+    if (statusMachineNow.status === 200 && statusMachineNow.data?.status === 'running') {
+      await calculateAvgRecordIfNeeded(machineId);
+    }
+  } catch (error) {
+    // console.error(error);
+  }
+};
+
+async function updateStatusMachine(machineId, targetStatus) {
+  const statusMachineNow = await machineStatusService.fetchStatus({ machineId });
+  if (statusMachineNow.status !== 200) {
+    throw new Error(statusMachineNow.message);
+  }
+
+  const currentStatus = statusMachineNow.data?.status || 'stopped';
+
+  if (currentStatus === targetStatus) {
+    console.log(`Status already ${targetStatus}, no update needed`);
+    return false;
+  }
+
+  const resultUpdateStatus = await machineStatusService.updateStatus({ machineId, status: targetStatus });
+  if (resultUpdateStatus.status !== 200) {
+    throw new Error(resultUpdateStatus.message);
+  }
+
+  console.log(`Status updated to ${targetStatus}`);
+  return true;
+}
+
+async function createLog(machineId, message) {
+  const resultInput = await activityLogService.createActivityLog({ machineId, time: new Date(), message });
+  if (resultInput.status !== 200) {
+    throw new Error(resultInput.message);
+  }
+}
+
+async function inputStartTime(machineId) {
+  const resultInputTime = await runtimeService.createRuntime({ machineId })
+  if (resultInputTime.status !== 200) {
+    throw new Error(resultInputTime.message);
+  }
+}
+
+async function updateRuntime(machineId) {
+  const resultUpdate = await runtimeService.updateRuntime({ machineId });
+  if (resultUpdate.status !== 200) {
+    throw new Error(resultUpdate.message);
+  }
+}
+
+async function calculateAvgRecordIfNeeded(machineId) {
+  const now = new Date();
+  const lastFiveMinutes = new Date(now.getTime() - 5 * 60 * 1000);
+  const lastAverage = await averageRecordService.fetchLatestAverage(machineId);
+
+  if (lastAverage?.status === 200 && lastAverage.data) {
+    const lastAverageTime = new Date(lastAverage.data.createdAt);
+    if (lastAverageTime > lastFiveMinutes) {
+      return;
+    }
+  }
+
+  const resultCalcAvg = await averageRecordService.createAverage({ machineId });
+  if (resultCalcAvg.status !== 200) {
+    throw new Error(resultCalcAvg.message);
+  }
+}

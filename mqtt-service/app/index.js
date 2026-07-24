@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://mosquitto:1883';
 const TOPIC = process.env.MQTT_TOPIC || 'plc/#';
-const DB_SERVICE_URL = process.env.DB_SERVICE_URL || 'http://db-service:8001';
+const DB_SERVICE_URL = process.env.DB_SERVICE_URL || 'http://energy-service:8001';
 
 console.log('MQTT service starting', { BROKER_URL, TOPIC, DB_SERVICE_URL });
 
@@ -35,6 +35,8 @@ client.on('message', async (topic, message) => {
       arus1: payload.arus1 || null,
       arus2: payload.arus2 || null,
       arus3: payload.arus3 || null,
+      getaran: payload.getaran || null,
+      temp: payload.temp || null,
       tegangan: payload.tegangan || null,
       kwatt: payload.kwatt || null,
     };

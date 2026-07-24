@@ -6,7 +6,7 @@ Arsitektur mikroservis untuk membaca data PLC (Modbus TCP & MQTT) dan menyimpann
 
 ### Backend Services
 
-- **`db-service`** (Node.js): REST API untuk menyimpan dan mengambil data PLC. Menggunakan Sequelize ORM dengan MySQL.
+- **`energy-service`** (Node.js): REST API untuk menyimpan dan mengambil data PLC. Menggunakan Sequelize ORM dengan MySQL.
   - PORT: 8001
   - Endpoints: `POST /records`, `GET /records`
 
@@ -80,7 +80,7 @@ PLC_ID=plc1
 PUBLISH_INTERVAL=60000
 
 # Services Configuration
-DB_SERVICE_URL=http://db-service:8001
+DB_SERVICE_URL=http://energy-service:8001
 DATABASE_URL=mysql://root:your_root_password@mysql:3306/plc-test
 ```
 
@@ -94,7 +94,7 @@ DATABASE_URL=mysql://root:your_root_password@mysql:3306/plc-test
 
 ### Services URLs
 
-- `db-service`: http://localhost:8001
+- `energy-service`: http://localhost:8001
 - `phpmyadmin`: http://localhost:8000 (username: root)
 - `modbus-service`: http://localhost:8000 (jika diaktifkan)
 - MQTT Broker: mqtt://localhost:1883

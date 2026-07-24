@@ -1,5 +1,5 @@
 {
-  "name": "db-service",
+  "name": "energy-service",
   "version": "1.0.0",
   "main": "app/index.js",
   "scripts": {
@@ -8,6 +8,9 @@
   "dependencies": {
     "express": "^4.18.3",
     "mysql2": "^3.6.0",
-    "sequelize": "^6.33.0"
+    "sequelize": "^6.33.0",
+    "node-cron": "^3.0.3",
+    "axios": "^1.7.9",
+    "ws": "^8.18.0"
   }
 }
