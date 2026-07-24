@@ -30,8 +30,8 @@ client.on('message', async (topic, message) => {
     }
 
     const record = {
-      _terminalTime: payload.terminalTime || new Date().toISOString(),
-      _groupName: payload.groupName || 'datamqtt',
+      _terminalTime: payload._terminalTime || new Date().toISOString(),
+      _groupName: payload._groupName || 'datamqtt',
       arus1: payload.arus1 || null,
       arus2: payload.arus2 || null,
       arus3: payload.arus3 || null,
