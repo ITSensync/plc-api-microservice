@@ -35,8 +35,8 @@ client.on('message', async (topic, message) => {
       arus1: payload.arus1 || null,
       arus2: payload.arus2 || null,
       arus3: payload.arus3 || null,
-      getaran: payload.vibrasi || null,
-      temp: payload.suhu_temp || null,
+      getaran: payload.vibrasi_frekuensi || null,
+      temp: payload.vibrasi_temp || null,
       tegangan: payload.tegangan || null,
       kwatt: payload.kwatt || null,
     };
