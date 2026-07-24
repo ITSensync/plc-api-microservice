@@ -6,7 +6,7 @@ const averageRecordService = require('../services/averageRecordService');
 
 exports.checkRecords = async () => {
   try {
-    const machineId = 'mta_mixer';
+    const machineId = 'mtamixer';
     const lastRecordsResponse = await recordService.fetchEnergyRecords({ limit: 1 });
 
     if (lastRecordsResponse.status !== 200 || !lastRecordsResponse.data?.length) {
