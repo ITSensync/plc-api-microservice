@@ -6,7 +6,7 @@ const averageRecordService = require('../services/averageRecordService');
 
 exports.checkRecords = async () => {
   try {
-    const machineId = 'plc1';
+    const machineId = 'mta_mixer';
     const lastRecordsResponse = await recordService.fetchEnergyRecords({ limit: 1 });
 
     if (lastRecordsResponse.status !== 200 || !lastRecordsResponse.data?.length) {
@@ -14,11 +14,8 @@ exports.checkRecords = async () => {
     }
 
     const latestRecord = lastRecordsResponse.data[0];
-    const now = new Date();
-    const lastRecordTime = new Date(latestRecord.createdAt);
-    const secondsDiff = Math.floor((now - lastRecordTime) / 1000);
 
-    const targetStatus = secondsDiff > 10 ? 'stopped' : 'running';
+    const targetStatus = latestRecord.getaran > 20 ? 'running' : 'stopped';
     const statusChanged = await updateStatusMachine(machineId, targetStatus);
 
     if (statusChanged) {

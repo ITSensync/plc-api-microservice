@@ -276,8 +276,8 @@ Machine.hasOne(StatusMachine, {
 
 const initializeDummyData = async () => {
   const [machine] = await Machine.findOrCreate({
-    where: { groupName: 'plc1' },
-    defaults: { groupName: 'plc1' },
+    where: { groupName: 'mta_mixer' },
+    defaults: { groupName: 'mta_mixer' },
   });
 
   await StatusMachine.findOrCreate({
