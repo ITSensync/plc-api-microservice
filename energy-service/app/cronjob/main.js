@@ -40,7 +40,7 @@ exports.checkRecords = async () => {
       await calculateAvgRecordIfNeeded(machineId);
     }
   } catch (error) {
-    // console.error(error);
+    console.error(error);
   }
 };
 
