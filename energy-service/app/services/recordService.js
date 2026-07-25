@@ -9,7 +9,7 @@ const parsePagination = (req) => {
 
 exports.createEnergyRecord = async (payload) => {
   try {
-    const { _groupName, _terminalTime, arus1, arus2, arus3, temp, getaran, tegangan, kwatt } = payload;
+    const { _groupName, _terminalTime, arus1, arus2, arus3, temp, getaran, tegangan, kwatt, mixerTime, machineTime } = payload;
 
     const machine = await Machine.findOne({ where: { groupName: _groupName } });
     if (!machine) {
@@ -26,6 +26,8 @@ exports.createEnergyRecord = async (payload) => {
       temp,
       tegangan,
       kwatt,
+      mixerTime,
+      machineTime
     });
 
     return {

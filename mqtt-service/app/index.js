@@ -39,6 +39,8 @@ client.on('message', async (topic, message) => {
       temp: payload.vibrasi_temp || null,
       tegangan: payload.tegangan || null,
       kwatt: payload.kwatt || null,
+      mixerTime: payload.mixerTime || null,
+      machineTime: payload.machineTime || null,
     };
 
     const res = await axios.post(`${DB_SERVICE_URL}/records`, record, { timeout: 5000 });

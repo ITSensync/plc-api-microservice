@@ -52,6 +52,14 @@ const EnergyRecord = sequelize.define('EnergyRecord', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
   },
+  mixerTime: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
+  machineTime: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
   kwatt: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
