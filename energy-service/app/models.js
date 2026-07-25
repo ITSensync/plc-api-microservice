@@ -46,7 +46,7 @@ const EnergyRecord = sequelize.define('EnergyRecord', {
   },
   temp: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+    allowNull: true,
   },
   tegangan: {
     type: DataTypes.DECIMAL(10, 2),
@@ -137,7 +137,7 @@ const AverageRecord = sequelize.define('AverageRecord', {
   },
   temp: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+    allowNull: true,
   },
   tegangan: {
     type: DataTypes.DECIMAL(10, 2),
@@ -296,5 +296,6 @@ module.exports = {
   ActivityLog,
   AverageRecord,
   StatusMachine,
+  RuntimeMachine,
   initializeDummyData,
 };
