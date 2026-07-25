@@ -200,7 +200,7 @@ const RuntimeMachine = sequelize.define('RuntimeMachine', {
     allowNull: true,
   },
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
