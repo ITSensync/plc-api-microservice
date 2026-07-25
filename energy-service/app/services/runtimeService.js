@@ -65,9 +65,10 @@ exports.createRuntime = async (payload) => {
     }
 
     const now = new Date();
+    const runtimeDate = getWibDate(now);
     const runtime = await RuntimeMachine.create({
       machineId: machine.groupName,
-      date: new Date(`${getWibDate(now)}T00:00:00+07:00`),
+      date: runtimeDate,
       startTime: getWibTime(now),
     });
 

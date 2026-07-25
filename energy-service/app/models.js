@@ -190,7 +190,6 @@ const RuntimeMachine = sequelize.define('RuntimeMachine', {
   machineId: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
     references: {
       model: 'machines',
       key: 'groupName',

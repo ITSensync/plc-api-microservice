@@ -55,7 +55,7 @@ exports.createAverage = async (payload) => {
       ],
       where: {
         machineId,
-        createdAt: { [Op.gte]: fiveMinutesAgo }
+        _terminalTime: { [Op.gte]: fiveMinutesAgo }
       },
       raw: true,
     });
