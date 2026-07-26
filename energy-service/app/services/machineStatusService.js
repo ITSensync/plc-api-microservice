@@ -1,4 +1,5 @@
 const { StatusMachine, Machine } = require("../models");
+const { broadcast } = require("../websocket/socketManager");
 
 exports.updateStatus = async (payload) => {
   try {

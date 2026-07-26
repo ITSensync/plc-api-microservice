@@ -3,6 +3,7 @@ const machineStatusService = require('../services/machineStatusService');
 const activityLogService = require('../services/activityLogService')
 const runtimeService = require('../services/runtimeService');
 const averageRecordService = require('../services/averageRecordService');
+const { broadcastMachineStatus, broadcastRuntimeStats, broadcastActivityLogs, broadcastTodayAverage } = require('../services/broardcastService');
 
 exports.checkRecords = async () => {
   try {
@@ -59,6 +60,9 @@ async function updateStatusMachine(machineId, targetStatus) {
     throw new Error(resultUpdateStatus.message);
   }
 
+  /* BROADCAST CALL */
+  await broadcastMachineStatus(machineId);
+
   console.log(`Status updated to ${targetStatus}`);
   return true;
 }
@@ -68,6 +72,10 @@ async function createLog(machineId, message) {
   if (resultInput.status !== 200) {
     throw new Error(resultInput.message);
   }
+
+  /* BROADCAST CALL */
+  await broadcastActivityLogs(machineId);
+
 }
 
 async function inputStartTime(machineId) {
@@ -82,6 +90,10 @@ async function updateRuntime(machineId) {
   if (resultUpdate.status !== 200) {
     throw new Error(resultUpdate.message);
   }
+
+  /* BROADCAST CALL */
+  await broadcastRuntimeStats(machineId);
+
 }
 
 async function calculateAvgRecordIfNeeded(machineId) {
@@ -100,4 +112,7 @@ async function calculateAvgRecordIfNeeded(machineId) {
   if (resultCalcAvg.status !== 200) {
     throw new Error(resultCalcAvg.message);
   }
+
+   /* BROADCAST CALL */
+  await broadcastTodayAverage(machineId);
 }

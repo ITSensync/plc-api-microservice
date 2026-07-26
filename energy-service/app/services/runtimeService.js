@@ -1,4 +1,6 @@
+const { where, fn } = require("sequelize");
 const { RuntimeMachine, Machine } = require("../models");
+const { broadcast } = require("../websocket/socketManager");
 
 const getWibDate = (date) => {
   const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -147,3 +149,85 @@ exports.updateRuntime = async (payload) => {
     };
   }
 };
+
+exports.statsRuntime = async (payload) => {
+  try {
+    const { machineId } = payload;
+    if (!machineId) {
+      return {
+        status: 400,
+        message: "Machine id cannot be null!",
+      };
+    }
+
+    const machine = await Machine.findOne({
+      where: { groupName: machineId },
+    });
+
+    if (!machine) {
+      return {
+        status: 404,
+        message: `Machine with id: ${machineId} not found!`,
+      };
+    }
+
+    /* TODAY RUNTIME */
+    const now = new Date();
+    const todayDate = getWibDate(now);
+
+    const todayRuntime = await RuntimeMachine.sum("total", {
+      where: {
+        machineId,
+        date: todayDate,
+      }
+    })
+
+    /* ALL TIME RUNTIME */
+    const allTimeRuntime = await RuntimeMachine.sum("total", {
+      where: {
+        machineId,
+      }
+    })
+
+    /* WEEKLY RUNTIME */
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+
+    const weeklyRuntime = await RuntimeMachine.findAll({
+      attributes: [
+        "date",
+        [fn("DAYNAME", col("date")), "day"],
+        [fn("SUM", col("total")), "total"],
+      ],
+      where: {
+        machineId,
+        date: {
+          [Op.between]: [
+            getWibDate(sevenDaysAgo),
+            todayDate,
+          ],
+        },
+      },
+      group: ["date"],
+      order: [["date", "ASC"]],
+    });
+
+    return {
+      status: 200,
+      message: 'Get Runtime Stats Successfully',
+      data: {
+        todayRuntime,
+        allTimeRuntime,
+        weeklyRuntime,
+      }
+    }
+
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: error.message,
+      error,
+    }
+  }
+}

@@ -1,4 +1,5 @@
 const { ActivityLog, Machine } = require('../models');
+const { broadcast } = require('../websocket/socketManager');
 
 const parsePagination = (req) => {
   const limit = Math.min(parseInt(req.query.limit || '100', 10), 1000);
@@ -33,16 +34,15 @@ exports.createActivityLog = async (payload) => {
 
 };
 
-exports.fetchActivityLogs = async (options) => {
+exports.fetchActivityLogs = async (payload) => {
   try {
     const where = {};
-    if (options.query.machineId) where.machineId = options.query.machineId;
+    if (payload.machineId) where.machineId = payload.machineId;
 
-    const { limit, offset } = parsePagination(options);
+    const { limit } = payload;
     const logs = await ActivityLog.findAll({
       where,
       limit,
-      offset,
       order: [['createdAt', 'DESC']],
       include: [{ model: Machine, as: 'machine' }],
     });

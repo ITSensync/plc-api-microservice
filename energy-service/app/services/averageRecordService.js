@@ -1,5 +1,19 @@
 const { AverageRecord, EnergyRecord } = require("../models")
 const { Op, fn, col } = require('sequelize');
+const { broadcast } = require("../websocket/socketManager");
+
+const roundValue = (value) => Number(value ? Number(value).toFixed(2) : 0);
+
+const getTodayRange = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+};
+
 
 exports.fetchLatestAverage = async (machineId) => {
   try {
@@ -78,3 +92,72 @@ exports.createAverage = async (payload) => {
     }
   }
 }
+
+exports.getTodayAverageData = async (payload) => {
+  try {
+    const { machineId } = payload;
+
+    if (!machineId) {
+      return {
+        status: 400,
+        message: 'Machine id cannot be null!',
+      };
+    }
+
+    const { start, end } = getTodayRange();
+    const records = await AverageRecord.findAll({
+      where: {
+        machineId,
+        createdAt: { [Op.between]: [start, end] },
+      },
+      order: [['createdAt', 'ASC']],
+      raw: true,
+    });
+    /* const records = await AverageRecord.findAll({
+      where: {
+        machineId,
+        createdAt: { [Op.between]: [start, end] },
+      },
+      attributes: [
+        'machineId',
+        'arus1',
+        'arus2',
+        'arus3',
+        'getaran',
+        'tegangan',
+        'temp',
+        'kwatt',
+        'createdAt',
+      ],
+      order: [['createdAt', 'ASC']],
+      raw: true,
+    });
+
+    if (!records.length) {
+      return {
+        status: 404,
+        message: 'No average records found for today',
+        data: null,
+      };
+    }
+
+    const averageKeys = ['arus1', 'arus2', 'arus3', 'getaran', 'tegangan', 'temp', 'kwatt'];
+    const avgData = averageKeys.reduce((acc, key) => {
+      const total = records.reduce((sum, item) => sum + Number(item[key] || 0), 0);
+      acc[key] = roundValue(total / records.length);
+      return acc;
+    }, {}); */
+
+    return {
+      status: 200,
+      message: 'Success fetch today average record',
+      data: records,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: error.message,
+      error,
+    };
+  }
+};
