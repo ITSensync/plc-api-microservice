@@ -21,8 +21,8 @@ exports.checkRecords = async () => {
 
     if (statusChanged) {
       const message = targetStatus === 'running'
-        ? 'Machine status changed to running'
-        : 'Machine status changed to stopped';
+        ? 'Machine status started'
+        : 'Machine status stopped';
 
       await createLog(machineId, message);
 
