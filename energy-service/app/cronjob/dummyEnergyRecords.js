@@ -18,7 +18,7 @@ const createDummyEnergyRecord = async () => {
     arus1: randomDecimal(1, 2),
     arus2: randomDecimal(1, 2),
     arus3: randomDecimal(1, 2),
-    getaran: randomDecimal(15, 19),
+    getaran: randomDecimal(15, 40),
     temp: randomDecimal(25, 45),
     tegangan: randomDecimal(210, 240),
     mixerTime: randomDecimal(0, 120),
