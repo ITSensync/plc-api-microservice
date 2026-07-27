@@ -1,3 +1,4 @@
+const { broadcast } = require("../websocket/socketManager");
 const { fetchActivityLogs } = require("./activityLogService");
 const { getTodayAverageData } = require("./averageRecordService");
 const { fetchStatus } = require("./machineStatusService");
