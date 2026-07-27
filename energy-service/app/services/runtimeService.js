@@ -1,4 +1,4 @@
-const { where, fn } = require("sequelize");
+const { where, fn, col, Op } = require("sequelize");
 const { RuntimeMachine, Machine } = require("../models");
 const { broadcast } = require("../websocket/socketManager");
 
@@ -75,7 +75,7 @@ exports.createRuntime = async (payload) => {
     });
 
     return {
-      status: 201,
+      status: 200,
       message: "Runtime created successfully",
       data: runtime,
     };
