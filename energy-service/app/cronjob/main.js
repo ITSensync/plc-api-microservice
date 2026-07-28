@@ -3,15 +3,37 @@ const machineStatusService = require('../services/machineStatusService');
 const activityLogService = require('../services/activityLogService')
 const runtimeService = require('../services/runtimeService');
 const averageRecordService = require('../services/averageRecordService');
-const { broadcastMachineStatus, broadcastRuntimeStats, broadcastActivityLogs, broadcastTodayAverage } = require('../services/broardcastService');
+const { broadcastMachineStatus, broadcastRuntimeStats, broadcastActivityLogs, broadcastTodayAverage, broadcastNotUpdateAlert } = require('../services/broardcastService');
+
+let lastNotUpdateBroadcast = 0;
 
 exports.checkRecords = async () => {
   try {
     const machineId = 'mtamixer';
     const lastRecordsResponse = await recordService.fetchEnergyRecords({ limit: 1 });
 
+    /* check last data not null */
     if (lastRecordsResponse.status !== 200 || !lastRecordsResponse.data?.length) {
       throw new Error('Last data not found');
+    }
+
+    // check not update
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    const BROADCAST_INTERVAL = 1 * 60 * 1000;
+
+
+    const lastDataTime = new Date(lastRecordsResponse.data[0].createdAt);
+    const diffTime = Date.now() - lastDataTime.getTime();
+
+    if (diffTime >= FIVE_MINUTES) {
+      const now = Date.now();
+
+      if (now - lastNotUpdateBroadcast >= BROADCAST_INTERVAL) {
+        broadcastNotUpdateAlert(machineId);
+        lastNotUpdateBroadcast = now;
+      }
+
+      return;
     }
 
     const latestRecord = lastRecordsResponse.data[0];
@@ -113,6 +135,6 @@ async function calculateAvgRecordIfNeeded(machineId) {
     throw new Error(resultCalcAvg.message);
   }
 
-   /* BROADCAST CALL */
+  /* BROADCAST CALL */
   await broadcastTodayAverage(machineId);
 }

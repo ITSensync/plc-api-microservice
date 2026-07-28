@@ -1,0 +1,3 @@
+cron baca data masuk di table energy -> jika time saat ini jaraknya kurang dari 5 detik -> status machine ubah ke running -> input ke activity log bahwa mesin start -> input waktu tanggal dan waktu start time mesin ke tabel runtime -> di dalam cron nanti ada cron lagi setiap 5 menit menghitung rata-rata
+
+jika cron baca interval di table energy lebih dari 5 detik -> ubah status machine jadi stopped -> input ke activity log bahwa mesin berhenti -> update end time di waktu tanggal terakhr di runtime -> cron agregasi data 5 menit berhenti menghitung

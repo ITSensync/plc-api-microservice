@@ -54,3 +54,14 @@ exports.broadcastRuntimeStats = async (machineId) => {
     })
   }
 }
+
+exports.broadcastNotUpdateAlert = async (machineId) => {
+  broadcast({
+    type: "not-update-alert",
+    machineId,
+    data: {
+      alert: true,
+      message: 'Realtime data not update after 5 minute',
+    }
+  })
+}
