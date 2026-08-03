@@ -1,4 +1,5 @@
 const { EnergyRecord, Machine } = require('../models');
+const { broadcastEnergyRecord } = require('../services/broardcastService');
 
 const MACHINE_ID = 'mtamixer';
 
@@ -25,6 +26,9 @@ const createDummyEnergyRecord = async () => {
     machineTime: randomDecimal(0, 480),
     kwatt: randomDecimal(0.5, 2),
   });
+
+  /* BROADCAST CALL */
+  await broadcastEnergyRecord(MACHINE_ID);
 
   console.log(`Dummy energy record created: ${record.id}`);
   return record;

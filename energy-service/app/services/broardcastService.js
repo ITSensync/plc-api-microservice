@@ -30,6 +30,20 @@ exports.broadcastTodayAverage = async (machineId) => {
   }
 }
 
+exports.broadcastEnergyRecord = async (machineId) => {
+  /* BROADCAST NEW DATA */
+  const { fetchTodayRecords } = require("./recordService");
+
+  const energyData = await fetchTodayRecords({ machineId });
+  if (energyData.status === 200) {
+    broadcast({
+      type: "today-records",
+      machineId,
+      data: energyData.data,
+    })
+  }
+}
+
 exports.broadcastMachineStatus = async (machineId) => {
   /* BROADCAST STATUS MACHINE */
   const resultStatus = await fetchStatus({ machineId });

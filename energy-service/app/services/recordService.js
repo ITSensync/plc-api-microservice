@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { EnergyRecord, Machine, ActivityLog } = require('../models');
 
 const parsePagination = (req) => {
@@ -6,6 +7,15 @@ const parsePagination = (req) => {
   return { limit, offset };
 };
 
+const getTodayRange = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+};
 
 exports.createEnergyRecord = async (payload) => {
   try {
@@ -16,7 +26,7 @@ exports.createEnergyRecord = async (payload) => {
       throw { status: 404, message: 'Machine not found for machineId' };
     }
 
-    const data = EnergyRecord.create({
+    const data = await EnergyRecord.create({
       machineId: _groupName,
       _terminalTime,
       arus1,
@@ -29,6 +39,10 @@ exports.createEnergyRecord = async (payload) => {
       mixerTime,
       machineTime
     });
+
+    /* BROADCAST CALL */
+    const { broadcastEnergyRecord } = require('./broardcastService');
+    await broadcastEnergyRecord(_groupName);
 
     return {
       status: 200,
@@ -69,6 +83,43 @@ exports.fetchEnergyRecords = async (options) => {
     return {
       status: 200,
       message: "Success fetch record",
+      data: records,
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: error.message,
+      error: error,
+    }
+  }
+};
+
+exports.fetchTodayRecords = async (payload) => {
+  try {
+    const { machineId } = payload;
+
+    if (!machineId) {
+      return {
+        status: 400,
+        message: 'Machine id cannot be null!',
+      };
+    }
+
+    const { start, end } = getTodayRange();
+
+    const records = await EnergyRecord.findAll({
+      where: {
+        machineId,
+        createdAt: { [Op.between]: [start, end] },
+      },
+      order: [['createdAt', 'ASC']],
+      raw: true,
+    });
+
+    return {
+      status: 200,
+      message: "Success fetch today record",
       data: records,
     }
   } catch (error) {

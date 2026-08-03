@@ -134,7 +134,4 @@ async function calculateAvgRecordIfNeeded(machineId) {
   if (resultCalcAvg.status !== 200) {
     throw new Error(resultCalcAvg.message);
   }
-
-  /* BROADCAST CALL */
-  await broadcastTodayAverage(machineId);
 }
