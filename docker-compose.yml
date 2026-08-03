@@ -48,6 +48,7 @@ services:
   mqtt-service:
     build: ./mqtt-service
     container_name: mqtt-service
+    restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -71,6 +72,7 @@ services:
   energy-service:
     build: ./energy-service
     container_name: energy-service
+    restart: always
     ports:
       - "8001:8001"
       - "8002:8002"
