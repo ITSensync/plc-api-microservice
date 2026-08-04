@@ -5,11 +5,9 @@ const { broadcast } = require("../websocket/socketManager");
 const roundValue = (value) => Number(value ? Number(value).toFixed(2) : 0);
 
 const getTodayRange = () => {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-
   const end = new Date();
-  end.setHours(23, 59, 59, 999);
+  const start = new Date(end);
+  start.setMinutes(start.getMinutes() - 2);
 
   return { start, end };
 };

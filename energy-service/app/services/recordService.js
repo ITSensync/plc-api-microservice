@@ -7,12 +7,52 @@ const parsePagination = (req) => {
   return { limit, offset };
 };
 
-const getTodayRange = () => {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
+const parsePagePagination = (req) => {
+  const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+  const limit = Math.min(parseInt(req.query.limit || '10', 10), 1000);
+  const offset = (page - 1) * limit;
+  return { page, limit, offset };
+};
 
+const parseDateFilter = (req) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate && !endDate) {
+    return {};
+  }
+
+  const normalizeDatePart = (value) => {
+    if (!value) {
+      return null;
+    }
+
+    const trimmed = String(value).trim();
+    const datePart = trimmed.split('T')[0];
+    return datePart || null;
+  };
+
+  const startDay = normalizeDatePart(startDate);
+  const endDay = normalizeDatePart(endDate || startDate);
+
+  if (!startDay || !endDay) {
+    return {};
+  }
+
+  const start = `${startDay} 00:00:00`;
+  const end = `${endDay} 23:59:59`;
+
+  return {
+    _terminalTime: {
+      [Op.like]: `%${startDay}%`,
+      [Op.like]: `%${endDay}%`,
+    },
+  };
+};
+
+const getTodayRange = () => {
   const end = new Date();
-  end.setHours(23, 59, 59, 999);
+  const start = new Date(end);
+  start.setMinutes(start.getMinutes() - 2);
 
   return { start, end };
 };
@@ -122,6 +162,41 @@ exports.fetchTodayRecords = async (payload) => {
       message: "Success fetch today record",
       data: records,
     }
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: error.message,
+      error: error,
+    }
+  }
+};
+
+exports.fetchPaginatedEnergyRecords = async (req) => {
+  try {
+    const { page, limit, offset } = parsePagePagination(req);
+    const dateFilter = parseDateFilter(req);
+
+    const totalItems = await EnergyRecord.count({
+      where: dateFilter,
+    });
+    const records = await EnergyRecord.findAll({
+      where: dateFilter,
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      raw: true,
+    });
+
+    return {
+      status: 200,
+      message: 'Success fetch paginated energy record',
+      data: records,
+      currentPage: page,
+      totalPages: Math.max(Math.ceil(totalItems / limit), 1),
+      totalItems,
+      limit,
+    };
   } catch (error) {
     console.error(error);
     return {
