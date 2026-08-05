@@ -1,5 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const cors = require('cors');
 const cron = require('node-cron');
 const { sequelize, initializeDummyData } = require('./models');
 const recordsRouter = require('./routes/records');
@@ -9,9 +12,14 @@ const machineStatusRouter = require('./routes/status');
 const job = require('./cronjob/main');
 const { createDummyEnergyRecord } = require('./cronjob/dummyEnergyRecords');
 const { mainWebSocket } = require('./websocket/main');
+const { uploadToServer } = require('./cronjob/uploadServer');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(morgan('dev'));
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
 app.use('/records', recordsRouter);
 app.use('/activity-logs', activityLogsRouter);
@@ -45,6 +53,11 @@ start();
 
 cron.schedule('*/5 * * * * *', async () => {
   await job.checkRecords();
+});
+
+cron.schedule('*/2 * * * *', async () => {
+  const result = await uploadToServer();
+  console.log(result);
 });
 
 // Jalankan setiap 3 detik untuk kebutuhan data dummy lokal.
