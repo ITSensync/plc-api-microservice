@@ -1,6 +1,7 @@
 const { where, fn, col, Op } = require("sequelize");
 const { RuntimeMachine, Machine } = require("../models");
 const { broadcast } = require("../websocket/socketManager");
+const axios = require('axios');
 
 const getWibDate = (date) => {
   const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -74,6 +75,16 @@ exports.createRuntime = async (payload) => {
       startTime: getWibTime(now),
     });
 
+    /* UPLOAD TO SERVER */
+    const payloadServer = { machineId: machine.groupName, date: runtimeDate, startTime: getWibTime(now) }
+
+    const response = await axios.post(`${process.env.UPLOAD_SERVER_URL}/runtime`, payloadServer, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+
     return {
       status: 200,
       message: "Runtime created successfully",
@@ -133,6 +144,15 @@ exports.updateRuntime = async (payload) => {
     const updatedRuntime = await runtime.update({
       stopTime: endTime,
       total,
+    });
+
+    const payloadServer = { machineId: machine.groupName, endTime, total }
+
+    const response = await axios.patch(`${process.env.UPLOAD_SERVER_URL}/runtime`, payloadServer, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
     });
 
     return {

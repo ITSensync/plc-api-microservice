@@ -24,7 +24,7 @@ exports.uploadToServer = async () => {
 
     const targetUrl = process.env.UPLOAD_SERVER_URL || 'http://host.docker.internal:3001/records';
 
-    const response = await axios.post(targetUrl, records, {
+    const response = await axios.post(`${targetUrl}/records`, records, {
       headers: {
         'Content-Type': 'application/json',
       },
