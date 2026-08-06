@@ -61,10 +61,10 @@ cron.schedule('*/2 * * * *', async () => {
 });
 
 // Jalankan setiap 3 detik untuk kebutuhan data dummy lokal.
-cron.schedule('*/3 * * * * *', async () => {
-  try {
-    await createDummyEnergyRecord();
-  } catch (error) {
-    console.error('Failed to create dummy energy record:', error);
-  }
-});
+// cron.schedule('*/3 * * * * *', async () => {
+//   try {
+//     await createDummyEnergyRecord();
+//   } catch (error) {
+//     console.error('Failed to create dummy energy record:', error);
+//   }
+// });
