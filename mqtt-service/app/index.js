@@ -46,7 +46,7 @@ client.on('message', async (topic, message) => {
     if (topic.startsWith('mqtt/orangepi/gasflowsensor/')) {
       try {
         const result = await sendGasFlow(payload);
-        console.log('Forwarded gas flow payload to energy-service', result);
+        console.log('Forwarded gas flow payload to energy-service');
       } catch (err) {
         console.error('Failed to forward gas flow', err.message || err);
       }
@@ -56,7 +56,7 @@ client.on('message', async (topic, message) => {
     if (topic.startsWith('data/haiwella8/mtamixer/')) {
       try {
         const result = await sendRecord(payload);
-        console.log('Forwarded mtamixer payload to energy-service', result);
+        console.log('Forwarded mtamixer payload to energy-service');
       } catch (err) {
         console.error('Failed to forward mtamixer record', err.message || err);
       }
