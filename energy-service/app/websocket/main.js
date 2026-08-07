@@ -5,6 +5,7 @@ const { getTodayAverageData } = require("../services/averageRecordService");
 const { fetchStatus } = require("../services/machineStatusService");
 const { statsRuntime } = require("../services/runtimeService");
 const { fetchTodayRecords } = require("../services/recordService");
+const { fetchTodayGasRecords } = require("../services/gasRecordService");
 
 const sendMessage = (ws, type, data) => {
   if (ws.readyState !== WebSocket.OPEN) return;
@@ -21,7 +22,8 @@ const sendInitialData = async (ws, machineId) => {
     statsRuntime({ machineId }).then((result) => ({ type: "runtime-stats", result })),
     fetchActivityLogs({ machineId, limit: 10 }).then((result) => ({ type: "activity-logs", result })),
     // getTodayAverageData({ machineId }).then((result) => ({ type: "today-average", result })),
-    fetchTodayRecords({ machineId}).then((result) => ({ type: "today-records", result }))
+    fetchTodayRecords({ machineId }).then((result) => ({ type: "today-records", result })),
+    fetchTodayGasRecords({ machineId }).then((result) => ({ type: "today-gas-records", result }))
   ]);
 
   payloads.forEach(({ type, result }) => {

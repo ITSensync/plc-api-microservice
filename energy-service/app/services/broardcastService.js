@@ -79,3 +79,16 @@ exports.broadcastNotUpdateAlert = async (machineId) => {
     }
   })
 }
+
+exports.broadcastGasRecord = async (machineId) => {
+  const { fetchTodayGasRecords } = require("./gasRecordService");
+
+  const gasData = await fetchTodayGasRecords({ machineId });
+  if (gasData.status === 200) {
+    broadcast({
+      type: "today-gas-records",
+      machineId,
+      data: gasData.data,
+    })
+  }
+}

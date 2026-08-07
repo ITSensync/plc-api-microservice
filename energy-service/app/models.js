@@ -73,6 +73,36 @@ const EnergyRecord = sequelize.define('EnergyRecord', {
   ],
 });
 
+const GasRecord = sequelize.define('GasRecord', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  machineId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: 'machines',
+      key: 'groupName',
+    },
+  },
+  flow: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
+  total_flow: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  }
+}, {
+  tableName: 'gas_records',
+  timestamps: true,
+  indexes: [
+    { fields: ['machineId'] },
+  ]
+});
+
 const ActivityLog = sequelize.define('ActivityLog', {
   id: {
     type: DataTypes.INTEGER,
@@ -254,6 +284,16 @@ Machine.hasMany(EnergyRecord, {
   as: 'energyRecords',
 });
 
+GasRecord.belongsTo(Machine, {
+  foreignKey: 'machineId',
+  as: 'machine',
+});
+
+Machine.hasMany(GasRecord, {
+  foreignKey: 'machineId',
+  as: 'gasRecords',
+});
+
 AverageRecord.belongsTo(Machine, {
   foreignKey: 'machineId',
   as: 'machine',
@@ -300,6 +340,7 @@ module.exports = {
   sequelize,
   Machine,
   EnergyRecord,
+  GasRecord,
   ActivityLog,
   AverageRecord,
   StatusMachine,
