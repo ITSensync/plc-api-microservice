@@ -11,7 +11,7 @@ exports.sendRecord = async (payload) => {
     arus3: payload.arus3 || null,
     getaran: payload.vibrasi_frekuensi || null,
     temp: payload.vibrasi_temp || null,
-    tegangan: payload.tegangan || null,
+    tegangan: payload.tegangan === NaN ? null : payload.tegangan,
     kwatt: payload.kwatt || null,
     mixerTime: payload.mixerTime || null,
     machineTime: payload.machineTime || null,
