@@ -74,7 +74,7 @@ exports.createEnergyRecord = async (payload) => {
       arus3,
       getaran,
       temp,
-      tegangan,
+      tegangan: 0,
       kwatt,
       mixerTime,
       machineTime
