@@ -38,7 +38,7 @@ exports.checkRecords = async () => {
 
     const latestRecord = lastRecordsResponse.data[0];
 
-    const targetStatus = latestRecord.getaran > 20 ? 'running' : 'stopped';
+    const targetStatus = latestRecord.getaran > 100 && latestRecord.arus1 > 5 && latestRecord.arus2 > 5 && latestRecord.arus3 > 5 ? 'running' : 'stopped';
     const statusChanged = await updateStatusMachine(machineId, targetStatus);
 
     if (statusChanged) {
